@@ -30,46 +30,63 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
 //******************************************************************************
-//   Write a Word to Port A (Port1+Port2)
-//
-//   Writes a Word(FFFFh) to Port A and stays in LPM4
-//   ACLK = 32.768kHz, MCLK = SMCLK = default DCO
-//
-//  Tested On: MSP430FR4133
-//             -----------------
-//         /|\|                 |
-//          | |                 |
-//          --|RST          PA.x|-->HI
-//            |                 |
-//            |                 |
-//
-//
-//   This example uses the following peripherals and I/O signals.  You must
-//   review these and change as needed for your own board:
-//   - GPIO Port peripheral
-//
-//   This example uses the following interrupt handlers.  To use this example
-//   in your own application you must add these interrupt handlers to your
-//   vector table.
-//   - None.
-//******************************************************************************
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "driverlib.h"
+#include "gpio.h"
+#include "lcdDisplay.h"
 
+#include "driverlib.h"
 #include "Board.h"
+
+/* LCD Driver Vars and Functions */
+
+lcd_t Lcd = {0};
+
+
+/* Peripheral Initializations */
+
+void _lcd_start(){
+    Lcd.gpios[LCD_RS].GPIO = LCD_RS_GPIO;
+    Lcd.gpios[LCD_RS].pin = LCD_RS_PIN;
+    Lcd.gpios[LCD_E].GPIO = LCD_E_GPIO;
+    Lcd.gpios[LCD_E].pin = LCD_E_PIN;
+    Lcd.gpios[LCD_D4].GPIO = LCD_D4_GPIO;
+    Lcd.gpios[LCD_D4].pin = LCD_D4_PIN;
+    Lcd.gpios[LCD_D5].GPIO = LCD_D5_GPIO;
+    Lcd.gpios[LCD_D5].pin = LCD_D5_PIN;
+    Lcd.gpios[LCD_D6].GPIO = LCD_D6_GPIO;
+    Lcd.gpios[LCD_D6].pin = LCD_D6_PIN;
+    Lcd.gpios[LCD_D7].GPIO = LCD_D7_GPIO;
+    Lcd.gpios[LCD_D7].pin = LCD_D7_PIN;
+    Lcd.columns = 20;
+    Lcd.rows = 4;
+    Lcd.interface = LCD_INTERFACE_4BIT;       
+    
+    lcd_init(&Lcd);
+}
 
 void main (void)
 {
     //Stop WDT
     WDT_A_hold(WDT_A_BASE);
 
+    //Initialize the clock
+    board_clock_setup();
+
     //Initialize gpios 
-    board_gpio_init();
+    board_gpio_setup();
+    GPIO_setOutputHighOnPin(USER_LED2_GPIO, USER_LED2_PIN);
+
+    //Start display LCD
+    _lcd_start();
+
+    GPIO_setOutputLowOnPin(USER_LED2_GPIO, USER_LED2_PIN);
+    lcd_send_string_pos(&Lcd, "Rusbe", 1 , 1);
 
     while (true){
-
+        GPIO_toggleOutputOnPin(USER_LED1_GPIO, USER_LED1_PIN);
+        delay_ms(50);
     }
 }

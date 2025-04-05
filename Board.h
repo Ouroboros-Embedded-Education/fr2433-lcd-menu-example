@@ -53,41 +53,64 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
+#include <stdint.h>
+
 #include "driverlib.h"
 
-#define LCD_RS_GPIO         GPIO_PORT_P1 
+
+#define LCD_RS_GPIO         GPIO_PORT_P2
 #define LCD_RS_PIN          GPIO_PIN2
 
-#define LCD_E_GPIO          GPIO_PORT_P1
-#define LCD_E_PIN           GPIO_PIN3
+#define LCD_E_GPIO          GPIO_PORT_P3
+#define LCD_E_PIN           GPIO_PIN2
 
 #define LCD_D4_GPIO         GPIO_PORT_P2
-#define LCD_D4_PIN          GPIO_PIN4
+#define LCD_D4_PIN          GPIO_PIN6
 
 #define LCD_D5_GPIO         GPIO_PORT_P2
-#define LCD_D5_PIN          GPIO_PIN7
+#define LCD_D5_PIN          GPIO_PIN5
 
-#define LCD_D6_GPIO         GPIO_PORT_P1
-#define LCD_D6_PIN          GPIO_PIN7
+#define LCD_D6_GPIO         GPIO_PORT_P3
+#define LCD_D6_PIN          GPIO_PIN1
 
 #define LCD_D7_GPIO         GPIO_PORT_P1
-#define LCD_D7_PIN          GPIO_PIN6
+#define LCD_D7_PIN          GPIO_PIN2
 
-#define USER_BTN1_GPIO      GPIO_PORT_P2
-#define USER_BTN1_PIN       GPIO_PIN1
+#define USER_BTN1_GPIO      GPIO_PORT_P1
+#define USER_BTN1_PIN       GPIO_PIN5
 
-#define USER_BTN2_GPIO      GPIO_PORT_P2
-#define USER_BTN2_PIN       GPIO_PIN0
+#define USER_BTN2_GPIO      GPIO_PORT_P1
+#define USER_BTN2_PIN       GPIO_PIN4
 
 #define USER_LED1_GPIO      GPIO_PORT_P1
 #define USER_LED1_PIN       GPIO_PIN1
 
 #define USER_LED2_GPIO      GPIO_PORT_P1
-#define USER_LED2_PIN       GPIO_PIN1
+#define USER_LED2_PIN       GPIO_PIN0
+
+//*****************************************************************************
+//
+//Target frequency for MCLK in kHz
+//
+//*****************************************************************************
+#define CS_MCLK_DESIRED_FREQUENCY_IN_KHZ   1000
+
+//*****************************************************************************
+//
+//MCLK/FLLRef Ratio
+//
+//*****************************************************************************
+#define CS_MCLK_FLLREF_RATIO   30
 
 /* Publics */
 
-void board_gpio_init();
+void board_gpio_setup();
+
+void board_clock_setup();
+
+void delay_us(int32_t us);
+
+void delay_ms(uint32_t ms);
 
 #endif // __BOARD_H__
 
