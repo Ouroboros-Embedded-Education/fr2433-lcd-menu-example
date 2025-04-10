@@ -83,9 +83,9 @@ void main (void)
     _lcd_start();
 
     GPIO_setOutputLowOnPin(USER_LED2_GPIO, USER_LED2_PIN);
-    lcd_send_string_pos(&Lcd, "Rusbe", 1 , 1);
 
     while (true){
+    lcd_send_string_pos(&Lcd, "Rusbe", 1 , 1);
         GPIO_toggleOutputOnPin(USER_LED1_GPIO, USER_LED1_PIN);
         delay_ms(50);
     }
