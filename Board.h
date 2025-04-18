@@ -73,20 +73,20 @@
 #define LCD_D6_GPIO         GPIO_PORT_P2
 #define LCD_D6_PIN          GPIO_PIN4
 
-#define LCD_D7_GPIO         GPIO_PORT_P2
-#define LCD_D7_PIN          GPIO_PIN7
+#define LCD_D7_GPIO         GPIO_PORT_P1
+#define LCD_D7_PIN          GPIO_PIN2
 
-#define USER_BTN1_GPIO      GPIO_PORT_P1
-#define USER_BTN1_PIN       GPIO_PIN3
+#define USER_SELECT_GPIO    GPIO_PORT_P1
+#define USER_SELECT_PIN     GPIO_PIN3
 
-#define USER_BTN2_GPIO      GPIO_PORT_P1
-#define USER_BTN2_PIN       GPIO_PIN2
+#define USER_ENTER_GPIO     GPIO_PORT_P2
+#define USER_ENTER_PIN      GPIO_PIN7
 
 #define USER_LED1_GPIO      GPIO_PORT_P1
-#define USER_LED1_PIN       GPIO_PIN1
+#define USER_LED1_PIN       GPIO_PIN0
 
 #define USER_LED2_GPIO      GPIO_PORT_P1
-#define USER_LED2_PIN       GPIO_PIN0
+#define USER_LED2_PIN       GPIO_PIN1
 
 //*****************************************************************************
 //
@@ -108,9 +108,13 @@ void board_gpio_setup();
 
 void board_clock_setup();
 
+void board_timer_setup();
+
 void delay_us(int32_t us);
 
 void delay_ms(uint32_t ms);
+
+void board_1ms_interrupt();
 
 #endif // __BOARD_H__
 

@@ -26,8 +26,8 @@ void board_gpio_setup(){
     GPIO_setOutputLowOnPin(USER_LED2_GPIO, USER_LED2_PIN);
 
     /* Configure Button Inputs */
-    GPIO_setAsInputPinWithPullUpResistor(USER_BTN1_GPIO, USER_BTN1_PIN);
-    GPIO_setAsInputPinWithPullUpResistor(USER_BTN2_GPIO, USER_BTN2_PIN);
+    GPIO_setAsInputPinWithPullUpResistor(USER_SELECT_GPIO, USER_SELECT_PIN);
+    GPIO_setAsInputPinWithPullUpResistor(USER_ENTER_GPIO, USER_ENTER_PIN);
             
     /*
     //MCLK set out to pins
@@ -73,11 +73,44 @@ void board_clock_setup(){
     SFR_enableInterrupt(SFR_OSCILLATOR_FAULT_INTERRUPT);
 }
 
+void board_timer_setup(){
+    //Start timer in continuous mode sourced by SMCLK (same as MCLK 1MHz)
+    Timer_A_initContinuousModeParam initContParam = {0};
+    initContParam.clockSource = TIMER_A_CLOCKSOURCE_SMCLK;
+    initContParam.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1;
+    initContParam.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
+    initContParam.timerClear = TIMER_A_DO_CLEAR;
+    initContParam.startTimer = false;
+    Timer_A_initContinuousMode(TIMER_A1_BASE, &initContParam);
+
+    //Initiaze compare mode
+    Timer_A_clearCaptureCompareInterrupt(TIMER_A1_BASE,
+        TIMER_A_CAPTURECOMPARE_REGISTER_0
+        );
+		
+    // Configure compare to generate interrupts every 1ms
+    Timer_A_initCompareModeParam initCompParam = {0};
+    initCompParam.compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_0;
+    initCompParam.compareInterruptEnable = TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
+    initCompParam.compareOutputMode = TIMER_A_OUTPUTMODE_OUTBITVALUE;
+    initCompParam.compareValue = 999;
+    Timer_A_initCompareMode(TIMER_A1_BASE, &initCompParam);
+
+
+    Timer_A_startCounter( TIMER_A1_BASE,
+            TIMER_A_CONTINUOUS_MODE
+                );
+
+    // enable interrupts
+    __bis_SR_register(GIE);
+
+}
+
 void delay_us(int32_t us){
     // TODO use a timer instead this
     do {
-        __delay_cycles(10);
-        us -= 10;
+        __delay_cycles(5);
+        us -= 200;
     } while (us > 0);
 }
 
@@ -86,4 +119,35 @@ void delay_ms(uint32_t ms){
         delay_us(1000);
         ms--;
     }
+}
+
+void __attribute__((__weak__)) board_1ms_interrupt(){
+
+
+}
+
+//******************************************************************************
+//
+//This is the TIMER1_A0 interrupt vector service routine.
+//
+//******************************************************************************
+#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+#pragma vector=TIMER1_A0_VECTOR
+__interrupt
+#elif defined(__GNUC__)
+__attribute__((interrupt(TIMER1_A0_VECTOR)))
+#endif
+void TIMER1_A0_ISR (void)
+{
+    uint16_t compVal = Timer_A_getCaptureCompareCount(TIMER_A1_BASE,
+            TIMER_A_CAPTURECOMPARE_REGISTER_0)
+            + 999;
+
+    board_1ms_interrupt();
+
+    //Add Offset to CCR0
+    Timer_A_setCompareValue(TIMER_A1_BASE,
+        TIMER_A_CAPTURECOMPARE_REGISTER_0,
+        compVal
+        );
 }
